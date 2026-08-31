@@ -195,6 +195,8 @@
   #root button.ghost:hover { color: var(--ink); border-color: var(--muted); }
   #root button:focus-visible { outline: 2px solid var(--led); outline-offset: 2px; }
   #root .hint { font-size: 11.5px; color: var(--muted); }
+  #root .ok-msg { color: var(--good); font-size: 12.5px; font-weight: 600; }
+  #root .err-msg { color: var(--bad); font-size: 12.5px; font-weight: 600; }
   #root .preview { margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
   #root .preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 9px; }
   #root .preview-grid label { font-size: 11.5px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
@@ -473,11 +475,20 @@
     };
     const existing = days.findIndex(d => d.date === date);
     if (existing >= 0) days[existing] = entry; else days.push(entry);
+    const before = days.slice();
     const ok = await save();
-    $("saveHint").textContent = ok
-      ? (existing >= 0 ? "היום עודכן ונשמר במאגר..." : "היום נשמר במאגר · העדכון יופיע אצל הצופים תוך דקה...")
-      : "השמירה נכשלה: " + (window.__saveErr || "בדוק טוקן והרשאות") + "...";
-    $("preview").classList.add("hidden"); $("raw").value = ""; $("parseHint").textContent = "";
+    if (ok) {
+      $("preview").classList.add("hidden"); $("raw").value = "";
+      $("parseHint").innerHTML = '<span class="ok-msg">✓ נשמר במאגר · ' +
+        (existing >= 0 ? "היום עודכן" : "יום חדש נוסף") +
+        ' · העדכון יופיע אצל הצופים תוך כדקה</span>';
+      $("saveHint").textContent = "";
+    } else {
+      days = before;
+      $("preview").classList.remove("hidden");
+      $("saveHint").innerHTML = '<span class="err-msg">✕ השמירה נכשלה ולא נשמר דבר: ' +
+        (window.__saveErr || "בדוק טוקן והרשאות") + '</span>';
+    }
     render();
   };
 
