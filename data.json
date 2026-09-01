@@ -14,6 +14,19 @@
       "notes": []
     },
     {
+      "date": "2026-08-30",
+      "regular": 1387,
+      "includesVip": true,
+      "parquet": 21,
+      "diamond": 8,
+      "gold": 4,
+      "daily": null,
+      "dailyParquet": null,
+      "pending": 0,
+      "notes": [],
+      "legacyDaily": true
+    },
+    {
       "date": "2026-09-01",
       "regular": 1443,
       "includesVip": true,
@@ -141,5 +154,5 @@
       }
     ]
   },
-  "updated": "2026-09-01T17:44:56.152Z"
+  "updated": "2026-09-01T17:45:29.102Z"
 }
