@@ -3,28 +3,143 @@
     {
       "date": "2026-08-28",
       "regular": 1367,
+      "includesVip": false,
+      "legacyDaily": true,
       "parquet": 18,
       "diamond": 4,
       "gold": 4,
-      "pending": 11
+      "daily": null,
+      "dailyParquet": null,
+      "pending": 11,
+      "notes": []
     },
     {
       "date": "2026-08-30",
       "regular": 1387,
-      "parquet": 21,
-      "diamond": 8,
+      "includesVip": false,
+      "parquet": 27,
+      "diamond": 6,
       "gold": 4,
-      "pending": 0
+      "daily": null,
+      "dailyParquet": null,
+      "pending": 0,
+      "notes": []
     },
     {
-      "date": "2026-08-31",
-      "regular": 1365,
-      "parquet": 29,
-      "diamond": 6,
+      "date": "2026-09-01",
+      "regular": 1443,
+      "includesVip": true,
+      "parquet": 35,
+      "diamond": 10,
       "gold": 6,
-      "pending": 0
+      "daily": 29,
+      "dailyParquet": 10,
+      "pending": 0,
+      "notes": [
+        "8 מנויים חינמים הונפקו באישור",
+        "4 מנויי פרקט שולמו ונספרו בדוח אתמול, והונפקו היום",
+        "12 מנויים בוטלו ונרכשו מחדש"
+      ]
     }
   ],
-  "vipSeparate": true,
-  "updated": "2026-09-01T06:46:42.590Z"
+  "updated": "2026-09-01T21:00:00.000Z",
+  "inventory": {
+    "asOf": "2026-08-28",
+    "soldAtBaseline": 1393,
+    "capacity": {
+      "seats": 3380,
+      "parquet": 95
+    },
+    "lockedTotal": 1058,
+    "availableAtBaseline": 1024,
+    "locked": [
+      {
+        "name": "הסכמים והתחייבויות (ספונסרים ו-VIP)",
+        "n": 193
+      },
+      {
+        "name": "יציע אורחת (לא למכירה)",
+        "n": 490
+      },
+      {
+        "name": "טריבונות יציע 1 (סגורות)",
+        "n": 108
+      },
+      {
+        "name": "משפחות שחקנים",
+        "n": 72
+      },
+      {
+        "name": "ארגון עידוד",
+        "n": 60
+      },
+      {
+        "name": "קבוצה אורחת",
+        "n": 50
+      },
+      {
+        "name": "עיתונאים (לא למכירה)",
+        "n": 30
+      },
+      {
+        "name": "עובדי מועדון",
+        "n": 25
+      },
+      {
+        "name": "שמור יציע 4",
+        "n": 20
+      },
+      {
+        "name": "מקומות בעלים",
+        "n": 10
+      }
+    ],
+    "sections": [
+      {
+        "name": "יציע 2 לא מסומן",
+        "total": 1043,
+        "left": 468
+      },
+      {
+        "name": "יציע 2 יהלום מסומן",
+        "total": 160,
+        "left": 85
+      },
+      {
+        "name": "יציע 1 עידוד לא מסומן",
+        "total": 467,
+        "left": 174
+      },
+      {
+        "name": "יציע 4 מסומן",
+        "total": 627,
+        "left": 89
+      },
+      {
+        "name": "יציע 4 כסף",
+        "total": 261,
+        "left": 15
+      },
+      {
+        "name": "יציע 4 זהב",
+        "total": 187,
+        "left": 76
+      },
+      {
+        "name": "יציע 4 פלטינום",
+        "total": 145,
+        "left": 77
+      },
+      {
+        "name": "פרקט מרכז",
+        "total": 95,
+        "left": 19
+      },
+      {
+        "name": "יציע 3 אורחת (לא למכירה)",
+        "total": 490,
+        "left": 0
+      }
+    ]
+  }
 }

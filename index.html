@@ -18,20 +18,22 @@
 
     <div class="shared-bar">
       <span class="dot"></span>
-      <span id="modeLabel">לוח צפייה · הנתונים מתעדכנים מהמאגר המרכזי</span>
+      <span id="modeLabel">לוח צפייה</span>
       <button class="ghost sm" id="refreshBtn">רענן</button>
       <span class="hint" id="syncHint"></span>
     </div>
 
     <section class="kpis" id="kpis"></section>
 
+    <section class="panel" id="flagPanel">
+      <div class="panel-head"><h2>בדיקות ואי־התאמות</h2><span class="hint" id="flagCount"></span></div>
+      <div id="flags"></div>
+    </section>
+
     <section class="panel">
       <div class="panel-head">
         <h2>מגמה יומית</h2>
-        <div class="legend">
-          <span class="lg lg-line">סה״כ מנויים</span>
-          <span class="lg lg-bar">VIP ליום</span>
-        </div>
+        <div class="legend"><span class="lg lg-line">סה״כ מנויים</span><span class="lg lg-bar">VIP חדשים ליום</span></div>
       </div>
       <div id="chart" class="chart"></div>
     </section>
@@ -41,15 +43,32 @@
       <div id="trends" class="trends"></div>
     </section>
 
-    <section class="panel hidden" id="adminPanel">
+    <section class="panel">
       <div class="panel-head">
-        <h2>הגדרות מנהל</h2>
+        <h2>פוטנציאל ומלאי · היכל שלמה</h2>
+        <span class="hint" id="invStamp"></span>
       </div>
+      <div id="capBar"></div>
+      <div id="invKpis" class="trends"></div>
+      <div class="inv-cols">
+        <div>
+          <h3 class="sub-h">נותר למכירה לפי יציע</h3>
+          <div id="secList"></div>
+        </div>
+        <div>
+          <h3 class="sub-h">כמות נעולה במערכת</h3>
+          <div class="table-scroll"><table id="lockTbl"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel hidden" id="adminPanel">
+      <div class="panel-head"><h2>הגדרות מנהל</h2></div>
       <div class="preview-grid">
         <label>GitHub owner<input id="c_owner" placeholder="username"></label>
         <label>Repository<input id="c_repo" placeholder="hapoel-subs"></label>
         <label>Branch<input id="c_branch" placeholder="main"></label>
-        <label>Access token<input id="c_token" type="password" placeholder="ghp_..."></label>
+        <label>Access token<input id="c_token" type="password" placeholder="github_pat_..."></label>
       </div>
       <div class="row-actions">
         <button class="primary" id="cfgSave">שמור הגדרות</button>
@@ -61,23 +80,27 @@
     <section class="panel hidden" id="entryPanel">
       <div class="panel-head">
         <h2>הזנת סיכום יומי</h2>
-        <button class="ghost" id="sampleBtn">הדבק דוגמה</button>
+        <button class="ghost sm" id="sampleBtn">הדבק דוגמה</button>
       </div>
-      <textarea id="raw" rows="6" placeholder="הדבק כאן את הסיכום היומי, למשל:&#10;סיכום יומי 28.8.2026 מכירת מנויים:&#10;מנויים רגילים: עומדים על 1,367 מנויים.&#10;מכירות VIP טלפוניות:&#10;רכשו פרקט: 18&#10;רכשו יהלום: 4&#10;רכשו זהב: 4&#10;11 פרקט נוספים ישלמו ביום א׳"></textarea>
+      <textarea id="raw" rows="8" placeholder="הדבק כאן את הסיכום היומי כמו שהתקבל בוואטסאפ, בכל אחד מהפורמטים..."></textarea>
       <div class="row-actions">
         <button class="primary" id="parseBtn">קרא נתונים</button>
-        <span class="hint" id="parseHint">הטקסט נקרא אוטומטית: תאריך, מנויים רגילים, פרקט, יהלום, זהב, וממתינים לתשלום...</span>
+        <span class="hint" id="parseHint">הלוח קורא תאריך, מספר מנויים, VIP מצטבר, רכישה יומית והערות...</span>
       </div>
 
       <div id="preview" class="preview hidden">
         <div class="preview-grid">
           <label>תאריך<input type="date" id="f_date"></label>
-          <label>מנויים רגילים (מצטבר)<input type="number" id="f_regular"></label>
-          <label>פרקט (VIP היום)<input type="number" id="f_parquet"></label>
-          <label>יהלום (VIP היום)<input type="number" id="f_diamond"></label>
-          <label>זהב (VIP היום)<input type="number" id="f_gold"></label>
+          <label>מספר המנויים כפי שדווח<input type="number" id="f_regular"></label>
+          <label>פרקט (מצטבר)<input type="number" id="f_parquet"></label>
+          <label>יהלום (מצטבר)<input type="number" id="f_diamond"></label>
+          <label>זהב (מצטבר)<input type="number" id="f_gold"></label>
+          <label>רכישה יומית שדווחה<input type="number" id="f_daily"></label>
+          <label>מתוכה פרקט<input type="number" id="f_dailyP"></label>
           <label>ממתינים לתשלום<input type="number" id="f_pending"></label>
         </div>
+        <label class="toggle big"><input type="checkbox" id="f_incl"> המספר שדווח כבר כולל את מנויי ה־VIP</label>
+        <label class="notes-lbl">הערות מהדיווח<textarea id="f_notes" rows="3"></textarea></label>
         <div class="row-actions">
           <button class="primary" id="saveBtn">שמור יום</button>
           <button class="ghost" id="cancelBtn">בטל</button>
@@ -89,12 +112,10 @@
     <section class="panel">
       <div class="panel-head">
         <h2>היסטוריה</h2>
-        <div class="head-tools">
-          <label class="toggle"><input type="checkbox" id="incVip" checked> VIP נספר בנפרד ממנויים רגילים</label>
-          <button class="ghost" id="csvBtn">ייצוא CSV</button>
-        </div>
+        <button class="ghost sm" id="csvBtn">ייצוא CSV</button>
       </div>
       <div class="table-scroll"><table id="hist"></table></div>
+      <div id="noteList"></div>
     </section>
 
     <footer class="foot">הנתונים נשמרים בקובץ data.json שבמאגר. הזנה נעשית במצב מנהל בלבד...</footer>
@@ -103,140 +124,128 @@
 
 <style>
   #root {
-    --bg: #0E1116;
-    --panel: #161B23;
-    --panel-2: #1C232D;
-    --line: #29313D;
-    --red: #E2001A;
-    --red-dim: #8E1420;
-    --led: #FFC24A;
-    --ink: #E9EDF3;
-    --muted: #8A97A8;
-    --good: #43D08A;
-    --bad: #FF6B6B;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: "Heebo", "Assistant", "Arial Hebrew", "Segoe UI", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    padding: 14px 12px 28px;
-    min-height: 100%;
+    --bg:#0E1116; --panel:#161B23; --panel-2:#1C232D; --line:#29313D; --red:#E2001A; --red-dim:#8E1420;
+    --led:#FFC24A; --ink:#E9EDF3; --muted:#8A97A8; --good:#43D08A; --bad:#FF6B6B; --warn:#FFB020;
+    background:var(--bg); color:var(--ink);
+    font-family:"Heebo","Assistant","Arial Hebrew","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; padding:14px 12px 28px; min-height:100%;
   }
-  #root * { box-sizing: border-box; }
-  #root .wrap { max-width: 1020px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-  #root h2 { font-size: 14px; letter-spacing: .04em; margin: 0; font-weight: 700; }
-  #root .hidden { display: none !important; }
+  #root *{box-sizing:border-box}
+  #root .wrap{max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+  #root h2{font-size:14px;letter-spacing:.04em;margin:0;font-weight:700}
+  #root .hidden{display:none !important}
 
-  /* scoreboard header */
-  #root .board {
-    display: flex; justify-content: space-between; align-items: stretch; gap: 12px;
-    background: linear-gradient(100deg, var(--red-dim) 0%, #14181F 55%);
-    border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px;
-  }
-  #root .board-id { display: flex; gap: 12px; align-items: center; }
-  #root .hammer { font-size: 30px; color: var(--red); line-height: 1; filter: drop-shadow(0 0 10px rgba(226,0,26,.45)); }
-  #root .club { font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
-  #root .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  #root .board-clock { text-align: left; }
-  #root .clock-label { font-size: 10.5px; color: var(--muted); letter-spacing: .08em; }
-  #root .clock-val {
-    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-    font-size: 20px; color: var(--led); letter-spacing: .06em; font-variant-numeric: tabular-nums;
-  }
+  #root .board{display:flex;justify-content:space-between;gap:12px;
+    background:linear-gradient(100deg,var(--red-dim) 0%,#14181F 55%);
+    border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  #root .board-id{display:flex;gap:12px;align-items:center}
+  #root .hammer{font-size:30px;color:var(--red);line-height:1;filter:drop-shadow(0 0 10px rgba(226,0,26,.45))}
+  #root .club{font-size:19px;font-weight:800}
+  #root .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  #root .board-clock{text-align:left}
+  #root .clock-label{font-size:10.5px;color:var(--muted);letter-spacing:.08em}
+  #root .clock-val{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:20px;color:var(--led);font-variant-numeric:tabular-nums}
 
-  #root .shared-bar { display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
-    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
-    padding: 8px 12px; font-size: 12px; color: var(--muted); }
-  #root .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); }
-  #root button.sm { padding: 5px 11px; font-size: 12px; margin-inline-start: auto; }
+  #root .shared-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--muted)}
+  #root .dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)}
+  #root button.sm{padding:5px 11px;font-size:12px;margin-inline-start:auto}
 
-  /* kpis */
-  #root .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  #root .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 13px; position: relative; overflow: hidden; }
-  #root .kpi::before { content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 3px; background: var(--line); }
-  #root .kpi.hi::before { background: var(--red); }
-  #root .kpi-label { font-size: 11.5px; color: var(--muted); }
-  #root .kpi-val {
-    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-    font-size: 27px; font-weight: 600; letter-spacing: -.02em; margin-top: 4px; font-variant-numeric: tabular-nums;
-  }
-  #root .kpi-delta { font-size: 12px; margin-top: 3px; font-variant-numeric: tabular-nums; }
-  #root .up { color: var(--good); } #root .down { color: var(--bad); } #root .flat { color: var(--muted); }
+  #root .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  #root .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;position:relative;overflow:hidden}
+  #root .kpi::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;background:var(--line)}
+  #root .kpi.hi::before{background:var(--red)}
+  #root .kpi-label{font-size:11.5px;color:var(--muted)}
+  #root .kpi-val{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:27px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
+  #root .kpi-delta{font-size:12px;margin-top:3px}
+  #root .up{color:var(--good)}#root .down{color:var(--bad)}#root .flat{color:var(--muted)}
 
-  /* panels */
-  #root .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-  #root .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-  #root .head-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  #root .legend { display: flex; gap: 12px; font-size: 11px; color: var(--muted); }
-  #root .lg::before { content: ""; display: inline-block; width: 10px; height: 3px; margin-inline-end: 5px; vertical-align: middle; border-radius: 2px; }
-  #root .lg-line::before { background: var(--led); }
-  #root .lg-bar::before { background: var(--red); height: 9px; }
-  #root .chart { width: 100%; overflow-x: auto; }
-  #root svg { display: block; width: 100%; height: auto; }
+  #root .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  #root .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  #root .legend{display:flex;gap:12px;font-size:11px;color:var(--muted)}
+  #root .lg::before{content:"";display:inline-block;width:10px;height:3px;margin-inline-end:5px;vertical-align:middle;border-radius:2px}
+  #root .lg-line::before{background:var(--led)}
+  #root .lg-bar::before{background:var(--red);height:9px}
+  #root .chart{width:100%;overflow-x:auto}
+  #root svg{display:block;width:100%;height:auto}
 
-  /* trends */
-  #root .trends { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
-  #root .tcard { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; }
-  #root .tcard b { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
-  #root .tcard span { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 19px; font-variant-numeric: tabular-nums; }
-  #root .tcard small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+  #root .flag{display:flex;gap:9px;align-items:flex-start;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:9px;padding:10px 11px;margin-bottom:8px;font-size:12.5px;line-height:1.5}
+  #root .flag:last-child{margin-bottom:0}
+  #root .flag.warn{border-inline-start:3px solid var(--warn)}
+  #root .flag.ok{border-inline-start:3px solid var(--good)}
+  #root .flag b{display:block;margin-bottom:2px}
+  #root .flag .mono{font-family:"SF Mono",ui-monospace,Menlo,monospace;color:var(--led)}
 
-  /* inputs */
-  #root textarea, #root input {
-    width: 100%; background: #0F141B; color: var(--ink); border: 1px solid var(--line);
-    border-radius: 9px; padding: 10px; font-size: 14px; font-family: inherit; resize: vertical;
-  }
-  #root input[type=number], #root input[type=date] { font-family: "SF Mono", ui-monospace, Menlo, monospace; }
-  #root textarea:focus, #root input:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: transparent; }
-  #root .row-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-  #root button { font-family: inherit; font-size: 13px; font-weight: 600; border-radius: 9px; padding: 9px 15px; cursor: pointer; border: 1px solid var(--line); }
-  #root button.primary { background: var(--red); border-color: var(--red); color: #fff; }
-  #root button.primary:hover { background: #FF1230; }
-  #root button.ghost { background: transparent; color: var(--muted); }
-  #root button.ghost:hover { color: var(--ink); border-color: var(--muted); }
-  #root button:focus-visible { outline: 2px solid var(--led); outline-offset: 2px; }
-  #root .hint { font-size: 11.5px; color: var(--muted); }
-  #root .ok-msg { color: var(--good); font-size: 12.5px; font-weight: 600; }
-  #root .err-msg { color: var(--bad); font-size: 12.5px; font-weight: 600; }
-  #root .preview { margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
-  #root .preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 9px; }
-  #root .preview-grid label { font-size: 11.5px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
-  #root .toggle { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-  #root .toggle input { width: auto; }
+  #root .trends{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  #root .tcard{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+  #root .tcard b{display:block;font-size:12px;color:var(--muted);font-weight:500}
+  #root .tcard span{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:19px;font-variant-numeric:tabular-nums}
+  #root .tcard small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
 
-  /* table */
-  #root .table-scroll { overflow-x: auto; }
-  #root table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  #root th, #root td { padding: 8px 9px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  #root th { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .03em; }
-  #root td.num { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
-  #root tr:last-child td { border-bottom: 0; }
-  #root .del { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 2px 6px; font-size: 15px; }
-  #root .del:hover { color: var(--bad); }
-  #root .empty { color: var(--muted); font-size: 13px; padding: 14px 2px; }
-  #root .foot { color: var(--muted); font-size: 11px; text-align: center; }
-  @media (max-width: 560px) {
-    #root .board { flex-direction: column; }
-    #root .board-clock { text-align: right; }
-    #root .kpi-val { font-size: 23px; }
-  }
+  #root .sub-h{font-size:12px;color:var(--muted);margin:14px 0 8px;font-weight:600}
+  #root .inv-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:700px){#root .inv-cols{grid-template-columns:1fr}}
+  #root .capbar{display:flex;height:26px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+  #root .capbar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  #root .caplegend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:7px}
+  #root .caplegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:5px;font-style:normal}
+  #root .secrow{margin-bottom:9px}
+  #root .secrow .lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+  #root .secrow .lbl span:last-child{font-family:"SF Mono",ui-monospace,Menlo,monospace;color:var(--muted)}
+  #root .track{background:#0F141B;border-radius:4px;height:7px;overflow:hidden}
+  #root .fill{height:100%;background:var(--red)}
+  #root .fill.low{background:var(--good)}
+
+  #root textarea,#root input{width:100%;background:#0F141B;color:var(--ink);border:1px solid var(--line);
+    border-radius:9px;padding:10px;font-size:14px;font-family:inherit;resize:vertical}
+  #root input[type=number],#root input[type=date]{font-family:"SF Mono",ui-monospace,Menlo,monospace}
+  #root textarea:focus,#root input:focus{outline:2px solid var(--red);outline-offset:1px;border-color:transparent}
+  #root .row-actions{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+  #root button{font-family:inherit;font-size:13px;font-weight:600;border-radius:9px;padding:9px 15px;cursor:pointer;border:1px solid var(--line)}
+  #root button.primary{background:var(--red);border-color:var(--red);color:#fff}
+  #root button.primary:hover{background:#FF1230}
+  #root button.ghost{background:transparent;color:var(--muted)}
+  #root button.ghost:hover{color:var(--ink);border-color:var(--muted)}
+  #root button:focus-visible{outline:2px solid var(--led);outline-offset:2px}
+  #root .hint{font-size:11.5px;color:var(--muted)}
+  #root .ok-msg{color:var(--good);font-size:12.5px;font-weight:600}
+  #root .err-msg{color:var(--bad);font-size:12.5px;font-weight:600}
+  #root .preview{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+  #root .preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px}
+  #root .preview-grid label{font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+  #root .toggle{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  #root .toggle input{width:auto}
+  #root .toggle.big{margin-top:10px;font-size:13px;color:var(--ink)}
+  #root .notes-lbl{display:block;font-size:11.5px;color:var(--muted);margin-top:9px}
+
+  #root .table-scroll{overflow-x:auto}
+  #root table{width:100%;border-collapse:collapse;font-size:13px}
+  #root th,#root td{padding:8px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  #root th{font-size:11px;color:var(--muted);font-weight:600}
+  #root td.num{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  #root tr:last-child td{border-bottom:0}
+  #root .del{background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:15px}
+  #root .del:hover{color:var(--bad)}
+  #root .empty{color:var(--muted);font-size:13px;padding:14px 2px}
+  #root .note-item{font-size:12px;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--line)}
+  #root .note-item b{color:var(--ink);font-weight:600}
+  #root .foot{color:var(--muted);font-size:11px;text-align:center}
+  @media(max-width:560px){#root .board{flex-direction:column}#root .board-clock{text-align:right}#root .kpi-val{font-size:23px}}
 </style>
 
 <script>
 (function () {
-  const CFG_KEY = "hapoel_admin_cfg_v1";
-  const FILE = "data.json";
+  const CFG_KEY = "hapoel_admin_cfg_v1", FILE = "data.json";
   const $ = (id) => document.getElementById(id);
   const nf = (n) => (n === null || n === undefined || isNaN(n)) ? "—" : Number(n).toLocaleString("he-IL");
-  let days = [];
-  let vipSeparate = true;
-  let sha = null;
+  const dmy = (d) => d.split("-").reverse().join(".");
+  let days = [], INV = null, isAdmin = false;
   let cfg = { owner: "", repo: "", branch: "main", token: "" };
-  let isAdmin = false;
 
-  /* owner/repo are guessed from the Pages URL: owner.github.io/repo/ */
+  /* ---------------- config ---------------- */
   function guessRepo() {
-    const h = location.hostname.split(".");
-    const seg = location.pathname.split("/").filter(Boolean);
+    const h = location.hostname.split("."), seg = location.pathname.split("/").filter(Boolean);
     return { owner: h.length > 2 ? h[0] : "", repo: seg.length ? seg[0] : "" };
   }
   function loadCfg() {
@@ -247,300 +256,327 @@
     if (!cfg.branch) cfg.branch = "main";
     isAdmin = !!cfg.token || location.hash === "#admin";
   }
-  function saveCfg() { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
-  function b64(str) {
-    const bytes = new TextEncoder().encode(str);
-    let bin = ""; bytes.forEach(b => bin += String.fromCharCode(b));
-    return btoa(bin);
+  function b64(str) { const b = new TextEncoder().encode(str); let s = ""; b.forEach(c => s += String.fromCharCode(c)); return btoa(s); }
+
+  /* ---------------- parser ----------------
+     Handles three observed report shapes:
+       A  מנויים רגילים: עומדים על 1,367   + VIP counts for that day
+       B  רכשו: 1,387                      + VIP counts cumulative
+       C  סה״כ: 1,443                      + VIP cumulative + רכישה יומית + הערות
+     VIP figures are treated as cumulative from format B onward.            */
+  function toNum(s) { return s ? parseInt(String(s).replace(/[,\s']/g, ""), 10) : 0; }
+  function parseText(t) {
+    const o = { date: "", regular: null, includesVip: false, parquet: 0, diamond: 0, gold: 0,
+                daily: null, dailyParquet: null, pending: 0, notes: [], legacyDaily: false };
+    const d = t.match(/(\d{1,2})[.\/\-](\d{1,2})[.\/\-](\d{2,4})/);
+    if (d) o.date = (d[3].length === 2 ? "20" + d[3] : d[3]) + "-" + String(d[2]).padStart(2, "0") + "-" + String(d[1]).padStart(2, "0");
+    const grab = (re) => { const m = t.match(re); return m ? toNum(m[1]) : null; };
+
+    const legacy = grab(/מנויים\s*רגילים[^\d]{0,30}([\d,]+)/);
+    const total  = grab(/סה[״"']?כ\s*[:：]\s*([\d,]+)/);
+    const bought = grab(/רכשו\s*[:：]\s*([\d,]+)/);
+    if (legacy !== null) { o.regular = legacy; o.legacyDaily = true; }
+    else if (total !== null) { o.regular = total; o.includesVip = true; }
+    else if (bought !== null) { o.regular = bought; }
+
+    o.parquet = grab(/רכשו\s*פרקט\s*[:：]?\s*([\d,]+)/) || 0;
+    o.diamond = grab(/רכשו\s*יהלום\s*[:：]?\s*([\d,]+)/) || 0;
+    o.gold    = grab(/רכשו\s*זהב\s*[:：]?\s*([\d,]+)/) || 0;
+
+    const dm = t.match(/רכשו\s*כולל\s*פרקט\s*[:：]?\s*([\d,]+)\s*(?:\(\s*([\d,]+)\s*פרקט\s*\))?/);
+    if (dm) { o.daily = toNum(dm[1]); if (dm[2]) o.dailyParquet = toNum(dm[2]); }
+
+    const p = t.match(/([\d,]+)\s*(?:פרקט|יהלום|זהב|מנויים)?\s*נוספים/);
+    o.pending = p ? toNum(p[1]) : 0;
+
+    t.split(/\n/).forEach(line => {
+      const m = line.match(/^\s*[*•\u2022\u200f\u2060]+\s*(.+\S)\s*$/);
+      if (m && m[1].length > 3) o.notes.push(m[1]);
+    });
+    return o;
   }
 
-  /* ---------- storage ---------- */
+  /* ---------------- derived ----------------
+     Every day stores the VIP tiers as reported. Days flagged legacyDaily
+     held that day's sales only, so they are accumulated forward; the rest
+     are already cumulative and used as-is.                                 */
+  function enrich() {
+    const s = [...days].sort((a, b) => a.date < b.date ? -1 : 1);
+    let carried = 0;
+    return s.map((d, i) => {
+      const tiers = (d.parquet || 0) + (d.diamond || 0) + (d.gold || 0);
+      const vipCum = d.legacyDaily ? (carried += tiers) : tiers;
+      carried = vipCum;
+      const total = d.includesVip ? (d.regular || 0) : (d.regular || 0) + vipCum;
+      return { ...d, tiers, vipCum, total, i };
+    }).map((d, i, a) => ({
+      ...d,
+      vipDay: i ? d.vipCum - a[i - 1].vipCum : d.vipCum,
+      regDelta: i ? (d.regular || 0) - (a[i - 1].regular || 0) : null,
+      totalDelta: i ? d.total - a[i - 1].total : null
+    }));
+  }
+
+  function deltaHTML(v, suf) {
+    if (v === null || v === undefined) return '<span class="flat">יום ראשון במעקב</span>';
+    const c = v > 0 ? "up" : v < 0 ? "down" : "flat", s = v > 0 ? "+" : v < 0 ? "−" : "±";
+    return '<span class="' + c + '">' + s + nf(Math.abs(v)) + (suf || "") + "</span>";
+  }
+
+  /* ---------------- reconciliation ----------------
+     The reports contain real inconsistencies. The board never silently
+     picks a reading: every mismatch is listed here with both numbers.      */
+  function checks(rows) {
+    const out = [];
+    rows.forEach((r, i) => {
+      if (r.daily !== null && r.daily !== undefined && r.totalDelta !== null && r.daily !== r.totalDelta) {
+        out.push({ t: "רכישה יומית מול הפרש מחושב · " + dmy(r.date),
+          d: 'הדיווח מציין <span class="mono">' + nf(r.daily) + '</span> רכישות היום, בעוד ההפרש מהיום הקודם הוא <span class="mono">' +
+             nf(r.totalDelta) + '</span>. פער של ' + nf(Math.abs(r.daily - r.totalDelta)) +
+             ' מנויים, שמוסבר בדרך כלל בביטולים, הנפקות חינם או מנויים שנספרו ביום אחר.' });
+      }
+      if (i && r.vipDay < 0) {
+        out.push({ t: "ירידה ב־VIP מצטבר · " + dmy(r.date),
+          d: 'המספר המצטבר ירד ב־<span class="mono">' + nf(Math.abs(r.vipDay)) + '</span>. או שהדיווח יומי ולא מצטבר, או שהיו ביטולים.' });
+      }
+      if (i && r.includesVip !== rows[i - 1].includesVip) {
+        out.push({ t: "שינוי בהגדרת המספר הראשי · " + dmy(r.date),
+          d: r.includesVip ? 'הדיווח עבר ל"סה״כ" ולכן נספר ככולל VIP. אם בפועל הוא ללא VIP, סה״כ היום גבוה ב־<span class="mono">' + nf(r.vipCum) + '</span>.'
+                           : 'הדיווח חזר לניסוח שאינו כולל VIP, ולכן ה־VIP נוסף אליו.' });
+      }
+    });
+    if (INV) {
+      const g = INV.availableAtBaseline - INV.sections.reduce((a, x) => a + x.left, 0);
+      if (g) out.push({ t: "פער במלאי לפי יציעים",
+        d: 'סכום הנותר בכל היציעים הוא <span class="mono">' + nf(INV.sections.reduce((a, x) => a + x.left, 0)) +
+           '</span> מול <span class="mono">' + nf(INV.availableAtBaseline) + '</span> שדווחו כפנויים לרכישה. פער ' + nf(g) + ' מקומות.' });
+    }
+    return out;
+  }
+
+  /* ---------------- render ---------------- */
+  function render() {
+    const rows = enrich(), last = rows[rows.length - 1];
+    $("lastDate").textContent = last ? dmy(last.date) : "—";
+    $("dayCount").textContent = rows.length ? rows.length + " ימים במעקב" : "אין נתונים";
+
+    $("kpis").innerHTML = last ? [
+      { l: "סה״כ מנויים", v: nf(last.total), d: deltaHTML(last.totalDelta, " מאתמול"), hi: 1 },
+      { l: "VIP מצטבר", v: nf(last.vipCum), d: '<span class="flat">פרקט ' + nf(last.parquet) + " · יהלום " + nf(last.diamond) + " · זהב " + nf(last.gold) + "</span>" },
+      { l: "VIP חדשים ביום האחרון", v: nf(last.vipDay), d: deltaHTML(last.regDelta, " במספר הראשי") },
+      { l: "רכישה יומית שדווחה", v: last.daily === null || last.daily === undefined ? "—" : nf(last.daily),
+        d: '<span class="flat">' + (last.dailyParquet ? "מתוכה " + nf(last.dailyParquet) + " פרקט" : "לא דווח פירוט") + "</span>" },
+      { l: "ממתינים לתשלום", v: nf(last.pending || 0), d: '<span class="flat">צפי ' + nf(last.total + (last.pending || 0)) + "</span>" }
+    ].map(k => '<div class="kpi' + (k.hi ? " hi" : "") + '"><div class="kpi-label">' + k.l + '</div><div class="kpi-val">' + k.v + '</div><div class="kpi-delta">' + k.d + "</div></div>").join("")
+      : '<div class="kpi"><div class="kpi-label">אין עדיין נתונים</div><div class="kpi-val">0</div><div class="kpi-delta flat">הזן סיכום יומי כדי להתחיל</div></div>';
+
+    const fl = checks(rows);
+    $("flagCount").textContent = fl.length ? fl.length + " סעיפים לבירור" : "";
+    $("flags").innerHTML = fl.length
+      ? fl.map(f => '<div class="flag warn"><span>▲</span><div><b>' + f.t + "</b>" + f.d + "</div></div>").join("")
+      : '<div class="flag ok"><span>✓</span><div>כל הדיווחים מסתדרים עם החישוב, ואין אי־התאמות פתוחות.</div></div>';
+
+    drawChart(rows); drawTrends(rows); drawInventory(rows); drawTable(rows);
+  }
+
+  function drawChart(rows) {
+    if (!rows.length) { $("chart").innerHTML = '<div class="empty">הגרף ייבנה מהיום הראשון שתזין...</div>'; return; }
+    const W = 700, H = 260, padT = 16, padB = 34, padS = 52, n = rows.length;
+    const mx = Math.max(...rows.map(r => r.total)) * 1.04 || 1, mn = Math.min(...rows.map(r => r.total)) * .96;
+    const mv = Math.max(...rows.map(r => Math.abs(r.vipDay)), 1);
+    const iW = W - padS * 2, iH = H - padT - padB;
+    const x = i => n === 1 ? W / 2 : padS + iW - (i * iW / (n - 1));
+    const y = v => padT + iH - ((v - mn) / (mx - mn || 1)) * iH;
+    const bw = Math.max(6, Math.min(30, iW / Math.max(n, 1) * .45));
+    let g = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="מגמת מנויים">';
+    for (let k = 0; k <= 3; k++) {
+      const yy = padT + iH * k / 3;
+      g += '<line x1="' + padS + '" x2="' + (W - padS) + '" y1="' + yy + '" y2="' + yy + '" stroke="#29313D"/>' +
+           '<text x="' + (W - padS + 8) + '" y="' + (yy + 4) + '" fill="#8A97A8" font-size="10">' + nf(Math.round(mx - (mx - mn) * k / 3)) + "</text>";
+    }
+    rows.forEach((r, i) => {
+      const h = (Math.abs(r.vipDay) / mv) * iH * .55;
+      g += '<rect x="' + (x(i) - bw / 2) + '" y="' + (padT + iH - h) + '" width="' + bw + '" height="' + h + '" fill="#E2001A" opacity=".75" rx="2"><title>' + dmy(r.date) + " · VIP חדשים " + r.vipDay + "</title></rect>" +
+           '<text x="' + x(i) + '" y="' + (H - 12) + '" fill="#8A97A8" font-size="10" text-anchor="middle">' + r.date.slice(8) + "." + r.date.slice(5, 7) + "</text>";
+    });
+    if (n > 1) g += '<polyline fill="none" stroke="#FFC24A" stroke-width="2.5" stroke-linejoin="round" points="' + rows.map((r, i) => x(i) + "," + y(r.total)).join(" ") + '"/>';
+    rows.forEach((r, i) => g += '<circle cx="' + x(i) + '" cy="' + y(r.total) + '" r="3.5" fill="#0E1116" stroke="#FFC24A" stroke-width="2"><title>' + dmy(r.date) + " · סה״כ " + r.total + "</title></circle>");
+    $("chart").innerHTML = g + "</svg>";
+  }
+
+  function pace(rows) {
+    if (rows.length < 2) return 0;
+    const f = rows[0], l = rows[rows.length - 1];
+    return (l.total - f.total) / Math.max(1, (new Date(l.date) - new Date(f.date)) / 86400000);
+  }
+
+  function drawTrends(rows) {
+    if (rows.length < 2) { $("trends").innerHTML = '<div class="tcard"><b>מגמות</b><span>—</span><small>נדרשים לפחות שני ימי מעקב...</small></div>'; return; }
+    const last = rows[rows.length - 1], p = pace(rows);
+    const vipAvg = rows.slice(1).reduce((a, r) => a + r.vipDay, 0) / (rows.length - 1);
+    const P = rows.reduce((a, r) => a + r.parquet, 0) ? last.parquet : 0;
+    const tot = last.vipCum || 1;
+    $("trends").innerHTML = [
+      { b: "קצב גידול כולל", s: (p >= 0 ? "+" : "−") + Math.abs(p).toFixed(1) + " ליום", sm: "מ־" + nf(rows[0].total) + " ל־" + nf(last.total) + " מאז " + dmy(rows[0].date) },
+      { b: "VIP חדשים ליום בממוצע", s: vipAvg.toFixed(1), sm: "מצטבר " + nf(last.vipCum) + " מנויי VIP" },
+      { b: "תמהיל VIP", s: Math.round(100 * P / tot) + "% פרקט", sm: "יהלום " + Math.round(100 * last.diamond / tot) + "% · זהב " + Math.round(100 * last.gold / tot) + "%" },
+      { b: "חלק ה־VIP בסך המנויים", s: (100 * last.vipCum / last.total).toFixed(1) + "%", sm: nf(last.vipCum) + " מתוך " + nf(last.total) }
+    ].map(c => '<div class="tcard"><b>' + c.b + '</b><span>' + c.s + '</span><small>' + c.sm + "</small></div>").join("");
+  }
+
+  function drawInventory(rows) {
+    if (!INV) return;
+    const cap = INV.capacity.seats + INV.capacity.parquet;
+    const last = rows.length ? rows[rows.length - 1] : null;
+    const sold = last ? last.total : INV.soldAtBaseline;
+    const since = sold - INV.soldAtBaseline;
+    const avail = Math.max(0, INV.availableAtBaseline - since);
+    $("invStamp").textContent = "בסיס מלאי ל־" + dmy(INV.asOf) + (since ? " · מעודכן ב־" + nf(since) + " מכירות מאז" : "");
+    const seg = [{ n: sold, c: "var(--red)", l: "נמכר" }, { n: INV.lockedTotal, c: "#4A5568", l: "נעול" }, { n: avail, c: "var(--led)", l: "פנוי", dark: 1 }];
+    $("capBar").innerHTML = '<div class="capbar">' + seg.map(x => '<div style="width:' + (100 * x.n / cap) + "%;background:" + x.c + (x.dark ? ";color:#10131A" : "") + '">' + (100 * x.n / cap > 7 ? nf(x.n) : "") + "</div>").join("") + "</div>" +
+      '<div class="caplegend">' + seg.map(x => "<span><i style='background:" + x.c + "'></i>" + x.l + " " + nf(x.n) + " · " + (100 * x.n / cap).toFixed(1) + "%</span>").join("") +
+      "<span>תכולה " + nf(cap) + " (" + nf(INV.capacity.seats) + " + " + nf(INV.capacity.parquet) + " פרקט)</span></div>";
+
+    const sellable = INV.soldAtBaseline + INV.availableAtBaseline, p = pace(rows);
+    $("invKpis").innerHTML = [
+      { b: "פנוי לרכישה", s: nf(avail), sm: since ? "היה " + nf(INV.availableAtBaseline) + " · ירד ב־" + nf(since) : "נכון לבסיס המלאי" },
+      { b: "מימוש הפוטנציאל הזמין", s: (100 * sold / sellable).toFixed(1) + "%", sm: nf(sold) + " מתוך " + nf(sellable) + " מקומות למכירה" },
+      { b: "תפוסה במלוא המכירה", s: (100 * (sold + INV.lockedTotal) / cap).toFixed(1) + "%", sm: "כולל " + nf(INV.lockedTotal) + " נעולים" },
+      { b: "ימים לאזילת המלאי", s: p > 0 ? Math.ceil(avail / p) + " ימים" : "—", sm: "בקצב הנוכחי" }
+    ].map(c => '<div class="tcard"><b>' + c.b + '</b><span>' + c.s + '</span><small>' + c.sm + "</small></div>").join("");
+
+    $("secList").innerHTML = INV.sections.filter(x => x.left > 0).sort((a, b) => b.left - a.left).map(x => {
+      const pct = 100 * x.left / x.total;
+      return '<div class="secrow"><div class="lbl"><span>' + x.name + "</span><span>" + nf(x.left) + " / " + nf(x.total) + '</span></div><div class="track"><div class="fill' + (pct < 25 ? " low" : "") + '" style="width:' + pct.toFixed(1) + '%"></div></div></div>';
+    }).join("");
+    $("lockTbl").innerHTML = "<tbody>" + INV.locked.map(l => "<tr><td>" + l.name + '</td><td class="num">' + nf(l.n) + "</td></tr>").join("") +
+      '<tr><td><b>סה״כ נעול</b></td><td class="num"><b>' + nf(INV.lockedTotal) + "</b></td></tr></tbody>";
+  }
+
+  function drawTable(rows) {
+    if (!rows.length) { $("hist").innerHTML = '<tr><td class="empty">עוד לא נשמרו ימים...</td></tr>'; $("noteList").innerHTML = ""; return; }
+    const head = ["תאריך", "מספר שדווח", "כולל VIP", "פרקט", "יהלום", "זהב", "VIP מצטבר", "VIP חדשים", "סה״כ", "Δ סה״כ", "יומי שדווח", "ממתינים"];
+    if (isAdmin) head.push("");
+    let h = "<thead><tr>" + head.map(x => "<th>" + x + "</th>").join("") + "</tr></thead><tbody>";
+    [...rows].reverse().forEach(r => {
+      const dc = v => v === null || v === undefined ? '<td class="num flat">—</td>' : '<td class="num ' + (v > 0 ? "up" : v < 0 ? "down" : "flat") + '">' + (v > 0 ? "+" : v < 0 ? "−" : "") + nf(Math.abs(v)) + "</td>";
+      h += "<tr><td>" + dmy(r.date) + '</td><td class="num">' + nf(r.regular) + "</td><td>" + (r.includesVip ? "כן" : "לא") +
+        '</td><td class="num">' + nf(r.parquet) + '</td><td class="num">' + nf(r.diamond) + '</td><td class="num">' + nf(r.gold) +
+        '</td><td class="num">' + nf(r.vipCum) + '</td><td class="num">' + nf(r.vipDay) + '</td><td class="num">' + nf(r.total) + "</td>" +
+        dc(r.totalDelta) + '<td class="num">' + (r.daily === null || r.daily === undefined ? "—" : nf(r.daily)) + '</td><td class="num">' + nf(r.pending || 0) + "</td>" +
+        (isAdmin ? '<td><button class="del" data-d="' + r.date + '">✕</button></td>' : "") + "</tr>";
+    });
+    $("hist").innerHTML = h + "</tbody>";
+    $("hist").querySelectorAll(".del").forEach(b => b.onclick = async () => {
+      const keep = days.slice();
+      days = days.filter(d => d.date !== b.dataset.d);
+      if (!(await save())) { days = keep; alert("המחיקה נכשלה: " + (window.__saveErr || "")); }
+      render();
+    });
+    const notes = rows.filter(r => r.notes && r.notes.length);
+    $("noteList").innerHTML = notes.length
+      ? '<h3 class="sub-h">הערות מהדיווחים</h3>' + notes.map(r => r.notes.map(n => '<div class="note-item"><b>' + dmy(r.date) + "</b> · " + n + "</div>").join("")).join("")
+      : "";
+  }
+
+  /* ---------------- io ---------------- */
   async function load() {
-    loadCfg();
-    applyMode();
+    loadCfg(); applyMode();
     try {
       const r = await fetch(FILE + "?t=" + Date.now(), { cache: "no-store" });
-      if (r.ok) {
-        const parsed = await r.json();
-        days = parsed.days || [];
-        vipSeparate = parsed.vipSeparate !== false;
-      }
+      if (r.ok) { const p = await r.json(); days = p.days || []; INV = p.inventory || null; }
     } catch (e) { days = []; }
-    $("incVip").checked = vipSeparate;
     render();
   }
-
-  /* writes data.json back to the repo through the GitHub API */
   async function save() {
-    if (!isAdmin || !cfg.token) return false;
+    if (!isAdmin || !cfg.token) { window.__saveErr = "אין טוקן"; return false; }
     const api = "https://api.github.com/repos/" + cfg.owner + "/" + cfg.repo + "/contents/" + FILE;
     const headers = { Authorization: "Bearer " + cfg.token, Accept: "application/vnd.github+json" };
     try {
       const cur = await fetch(api + "?ref=" + cfg.branch + "&t=" + Date.now(), { headers, cache: "no-store" });
-      sha = cur.ok ? (await cur.json()).sha : null;
-      const body = {
-        message: "עדכון מנויים " + new Date().toISOString().slice(0, 10),
-        content: b64(JSON.stringify({ days, vipSeparate, updated: new Date().toISOString() }, null, 2)),
-        branch: cfg.branch
-      };
+      const sha = cur.ok ? (await cur.json()).sha : null;
+      const body = { message: "עדכון מנויים " + new Date().toISOString().slice(0, 10), branch: cfg.branch,
+        content: b64(JSON.stringify({ days, inventory: INV, updated: new Date().toISOString() }, null, 2)) };
       if (sha) body.sha = sha;
       const put = await fetch(api, { method: "PUT", headers, body: JSON.stringify(body) });
-      if (!put.ok) { const e = await put.json().catch(() => ({})); throw new Error(e.message || put.status); }
+      if (!put.ok) throw new Error((await put.json().catch(() => ({}))).message || put.status);
       return true;
     } catch (e) { window.__saveErr = e.message; return false; }
   }
-
   function applyMode() {
     $("adminPanel").classList.toggle("hidden", !isAdmin);
     $("entryPanel").classList.toggle("hidden", !isAdmin);
-    $("modeLabel").textContent = isAdmin
-      ? "מצב מנהל · שמירה כותבת ישירות למאגר"
-      : "לוח צפייה · הנתונים מתעדכנים מהמאגר המרכזי";
-    $("c_owner").value = cfg.owner; $("c_repo").value = cfg.repo;
-    $("c_branch").value = cfg.branch; $("c_token").value = cfg.token;
+    $("modeLabel").textContent = isAdmin ? "מצב מנהל · שמירה כותבת ישירות למאגר" : "לוח צפייה · הנתונים מתעדכנים מהמאגר המרכזי";
+    $("c_owner").value = cfg.owner; $("c_repo").value = cfg.repo; $("c_branch").value = cfg.branch; $("c_token").value = cfg.token;
   }
 
-  /* ---------- parsing ---------- */
-  function toNum(s) { return s ? parseInt(String(s).replace(/[,\s']/g, ""), 10) : 0; }
-  function parseText(t) {
-    const out = { date: "", regular: null, parquet: 0, diamond: 0, gold: 0, pending: 0 };
-    const d = t.match(/(\d{1,2})[.\/\-](\d{1,2})[.\/\-](\d{2,4})/);
-    if (d) {
-      let y = d[3].length === 2 ? "20" + d[3] : d[3];
-      out.date = y + "-" + String(d[2]).padStart(2, "0") + "-" + String(d[1]).padStart(2, "0");
-    }
-    const grab = (re) => { const m = t.match(re); return m ? toNum(m[1]) : null; };
-    out.regular = grab(/מנויים\s*רגילים[^\d]{0,30}([\d,]+)/);
-    out.parquet = grab(/פרקט[^\d\n]{0,15}([\d,]+)/) || 0;
-    out.diamond = grab(/יהלום[^\d\n]{0,15}([\d,]+)/) || 0;
-    out.gold = grab(/זהב[^\d\n]{0,15}([\d,]+)/) || 0;
-    const p = t.match(/([\d,]+)\s*(?:פרקט|יהלום|זהב|מנויים)?\s*נוספים/);
-    out.pending = p ? toNum(p[1]) : 0;
-    return out;
-  }
-
-  /* ---------- derived ---------- */
-  function enrich() {
-    const s = [...days].sort((a, b) => a.date < b.date ? -1 : 1);
-    let vipCum = 0;
-    return s.map((d, i) => {
-      const vipDay = (d.parquet || 0) + (d.diamond || 0) + (d.gold || 0);
-      vipCum += vipDay;
-      const total = vipSeparate ? (d.regular || 0) + vipCum : (d.regular || 0);
-      const prev = i > 0 ? s[i - 1] : null;
-      return {
-        ...d, vipDay, vipCum, total,
-        regDelta: prev ? (d.regular || 0) - (prev.regular || 0) : null,
-        totalDelta: null, i
-      };
-    }).map((d, i, arr) => ({ ...d, totalDelta: i > 0 ? d.total - arr[i - 1].total : null }));
-  }
-
-  function deltaHTML(v, suffix) {
-    if (v === null || v === undefined) return '<span class="flat">יום ראשון במעקב</span>';
-    const cls = v > 0 ? "up" : v < 0 ? "down" : "flat";
-    const sign = v > 0 ? "+" : v < 0 ? "−" : "±";
-    return '<span class="' + cls + '">' + sign + nf(Math.abs(v)) + (suffix || "") + '</span>';
-  }
-
-  /* ---------- render ---------- */
-  function render() {
-    const rows = enrich();
-    const last = rows[rows.length - 1];
-
-    $("lastDate").textContent = last ? last.date.split("-").reverse().join(".") : "—";
-    $("dayCount").textContent = rows.length ? rows.length + " ימים במעקב" : "אין נתונים";
-
-    /* KPIs */
-    const kpis = last ? [
-      { l: "סה״כ מנויים", v: nf(last.total), d: deltaHTML(last.totalDelta, " מאתמול"), hi: true },
-      { l: "מנויים רגילים", v: nf(last.regular), d: deltaHTML(last.regDelta, " מאתמול") },
-      { l: "VIP היום", v: nf(last.vipDay), d: '<span class="flat">פרקט ' + nf(last.parquet) + " · יהלום " + nf(last.diamond) + " · זהב " + nf(last.gold) + "</span>" },
-      { l: "VIP מצטבר", v: nf(last.vipCum), d: '<span class="flat">' + (last.total ? (100 * last.vipCum / last.total).toFixed(1) : "0") + "% מסה״כ</span>" },
-      { l: "ממתינים לתשלום", v: nf(last.pending), d: '<span class="flat">צפי סה״כ ' + nf(last.total + (last.pending || 0)) + "</span>" }
-    ] : [];
-    $("kpis").innerHTML = kpis.length ? kpis.map(k =>
-      '<div class="kpi' + (k.hi ? " hi" : "") + '"><div class="kpi-label">' + k.l + '</div><div class="kpi-val">' + k.v + '</div><div class="kpi-delta">' + k.d + '</div></div>'
-    ).join("") : '<div class="kpi"><div class="kpi-label">אין עדיין נתונים</div><div class="kpi-val">0</div><div class="kpi-delta flat">הזן סיכום יומי כדי להתחיל</div></div>';
-
-    drawChart(rows);
-    drawTrends(rows);
-    drawTable(rows);
-  }
-
-  function drawChart(rows) {
-    if (rows.length < 1) { $("chart").innerHTML = '<div class="empty">הגרף ייבנה מהיום הראשון שתזין...</div>'; return; }
-    const W = 700, H = 260, padT = 16, padB = 34, padS = 52;
-    const n = rows.length;
-    const maxTotal = Math.max(...rows.map(r => r.total)) * 1.04 || 1;
-    const minTotal = Math.min(...rows.map(r => r.total)) * 0.96;
-    const maxVip = Math.max(...rows.map(r => r.vipDay), 1);
-    const innerW = W - padS * 2, innerH = H - padT - padB;
-    const x = (i) => n === 1 ? W / 2 : padS + innerW - (i * innerW / (n - 1));
-    const yT = (v) => padT + innerH - ((v - minTotal) / (maxTotal - minTotal || 1)) * innerH;
-    const bw = Math.max(6, Math.min(30, innerW / Math.max(n, 1) * 0.45));
-
-    let g = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="מגמת מנויים יומית">';
-    for (let k = 0; k <= 3; k++) {
-      const y = padT + innerH * k / 3;
-      g += '<line x1="' + padS + '" x2="' + (W - padS) + '" y1="' + y + '" y2="' + y + '" stroke="#29313D" stroke-width="1"/>';
-      g += '<text x="' + (W - padS + 8) + '" y="' + (y + 4) + '" fill="#8A97A8" font-size="10">' + nf(Math.round(maxTotal - (maxTotal - minTotal) * k / 3)) + '</text>';
-    }
-    rows.forEach((r, i) => {
-      const h = (r.vipDay / maxVip) * innerH * 0.55;
-      g += '<rect x="' + (x(i) - bw / 2) + '" y="' + (padT + innerH - h) + '" width="' + bw + '" height="' + h + '" fill="#E2001A" opacity=".75" rx="2"><title>' + r.date + ' · VIP ' + r.vipDay + '</title></rect>';
-      g += '<text x="' + x(i) + '" y="' + (H - 12) + '" fill="#8A97A8" font-size="10" text-anchor="middle">' + r.date.slice(8) + "." + r.date.slice(5, 7) + '</text>';
-    });
-    if (n > 1) {
-      g += '<polyline fill="none" stroke="#FFC24A" stroke-width="2.5" stroke-linejoin="round" points="' + rows.map((r, i) => x(i) + "," + yT(r.total)).join(" ") + '"/>';
-    }
-    rows.forEach((r, i) => {
-      g += '<circle cx="' + x(i) + '" cy="' + yT(r.total) + '" r="3.5" fill="#0E1116" stroke="#FFC24A" stroke-width="2"><title>' + r.date + ' · סה״כ ' + r.total + '</title></circle>';
-    });
-    g += '</svg>';
-    $("chart").innerHTML = g;
-  }
-
-  function drawTrends(rows) {
-    if (rows.length < 2) {
-      $("trends").innerHTML = '<div class="tcard"><b>מגמות</b><span>—</span><small>נדרשים לפחות שני ימי מעקב לחישוב קצב ותחזית...</small></div>';
-      return;
-    }
-    const last = rows[rows.length - 1];
-    const win = rows.slice(-7);
-    const spanDays = Math.max(1, (new Date(win[win.length - 1].date) - new Date(win[0].date)) / 86400000);
-    const vipAvg = win.reduce((a, r) => a + r.vipDay, 0) / win.length;
-    const totalGrowth = last.total - rows[0].total;
-    const pace = totalGrowth / Math.max(1, (new Date(last.date) - new Date(rows[0].date)) / 86400000);
-    const p = rows.reduce((a, r) => a + r.parquet, 0), dmd = rows.reduce((a, r) => a + r.diamond, 0), gld = rows.reduce((a, r) => a + r.gold, 0);
-    const vipTot = p + dmd + gld || 1;
-    const milestone = Math.ceil((last.total + 1) / 250) * 250;
-    const eta = pace > 0 ? Math.ceil((milestone - last.total) / pace) : null;
-
-    const cards = [
-      { b: "קצב VIP יומי ממוצע", s: vipAvg.toFixed(1), sm: "ממוצע על " + win.length + " ימי המעקב האחרונים" },
-      { b: "קצב גידול כולל", s: (pace >= 0 ? "+" : "−") + Math.abs(pace).toFixed(1) + " ליום", sm: "סה״כ " + (totalGrowth >= 0 ? "+" : "−") + nf(Math.abs(totalGrowth)) + " מתחילת המעקב" },
-      { b: "תמהיל VIP", s: Math.round(100 * p / vipTot) + "% פרקט", sm: "יהלום " + Math.round(100 * dmd / vipTot) + "% · זהב " + Math.round(100 * gld / vipTot) + "%" },
-      { b: "תחזית ל־" + nf(milestone), s: eta ? eta + " ימים" : "לא ניתן", sm: eta ? "בקצב הנוכחי, חסרים " + nf(milestone - last.total) + " מנויים" : "אין גידול חיובי בקצב הנוכחי" },
-      { b: "צנרת ידועה", s: nf(last.pending), sm: "ממתינים לתשלום · יעלו את סה״כ ל־" + nf(last.total + (last.pending || 0)) }
-    ];
-    $("trends").innerHTML = cards.map(c => '<div class="tcard"><b>' + c.b + '</b><span>' + c.s + '</span><small>' + c.sm + '</small></div>').join("");
-  }
-
-  function drawTable(rows) {
-    if (!rows.length) { $("hist").innerHTML = '<tr><td class="empty">עוד לא נשמרו ימים...</td></tr>'; return; }
-    const head = ["תאריך", "רגילים", "Δ רגילים", "פרקט", "יהלום", "זהב", "VIP יום", "VIP מצטבר", "סה״כ", "Δ סה״כ", "ממתינים"];
-    if (isAdmin) head.push("");
-    let h = "<thead><tr>" + head.map(x => "<th>" + x + "</th>").join("") + "</tr></thead><tbody>";
-    [...rows].reverse().forEach(r => {
-      const dcell = (v) => v === null ? '<td class="num flat">—</td>' : '<td class="num ' + (v > 0 ? "up" : v < 0 ? "down" : "flat") + '">' + (v > 0 ? "+" : v < 0 ? "−" : "") + nf(Math.abs(v)) + "</td>";
-      h += "<tr>" +
-        "<td>" + r.date.split("-").reverse().join(".") + "</td>" +
-        '<td class="num">' + nf(r.regular) + "</td>" + dcell(r.regDelta) +
-        '<td class="num">' + nf(r.parquet) + '</td><td class="num">' + nf(r.diamond) + '</td><td class="num">' + nf(r.gold) + "</td>" +
-        '<td class="num">' + nf(r.vipDay) + '</td><td class="num">' + nf(r.vipCum) + '</td><td class="num">' + nf(r.total) + "</td>" +
-        dcell(r.totalDelta) + '<td class="num">' + nf(r.pending) + "</td>" +
-        (isAdmin ? '<td><button class="del" data-d="' + r.date + '" title="מחק יום">✕</button></td>' : "") + "</tr>";
-    });
-    $("hist").innerHTML = h + "</tbody>";
-    $("hist").querySelectorAll(".del").forEach(b => b.onclick = async () => {
-      days = days.filter(d => d.date !== b.dataset.d);
-      await save(); render();
-    });
-  }
-
-  /* ---------- events ---------- */
+  /* ---------------- events ---------------- */
   $("parseBtn").onclick = () => {
     const t = $("raw").value.trim();
-    if (!t) { $("parseHint").textContent = "אין טקסט לקריאה. הדבק את הסיכום היומי..."; return; }
+    if (!t) { $("parseHint").textContent = "אין טקסט לקריאה..."; return; }
     const p = parseText(t);
     $("f_date").value = p.date || new Date().toISOString().slice(0, 10);
     $("f_regular").value = p.regular === null ? "" : p.regular;
-    $("f_parquet").value = p.parquet; $("f_diamond").value = p.diamond;
-    $("f_gold").value = p.gold; $("f_pending").value = p.pending;
+    $("f_parquet").value = p.parquet; $("f_diamond").value = p.diamond; $("f_gold").value = p.gold;
+    $("f_daily").value = p.daily === null ? "" : p.daily;
+    $("f_dailyP").value = p.dailyParquet === null ? "" : p.dailyParquet;
+    $("f_pending").value = p.pending;
+    $("f_incl").checked = p.includesVip;
+    $("f_notes").value = p.notes.join("\n");
+    $("preview").dataset.legacy = p.legacyDaily ? "1" : "";
     $("preview").classList.remove("hidden");
-    $("parseHint").textContent = "בדוק את השדות ותקן במידת הצורך, ואז שמור...";
+    $("parseHint").textContent = "בדוק את השדות, שים לב במיוחד לסימון 'כולל VIP', ואז שמור...";
   };
 
   $("saveBtn").onclick = async () => {
     const date = $("f_date").value;
     if (!date) { $("saveHint").textContent = "חסר תאריך..."; return; }
-    const entry = {
-      date,
-      regular: parseInt($("f_regular").value || 0, 10),
-      parquet: parseInt($("f_parquet").value || 0, 10),
-      diamond: parseInt($("f_diamond").value || 0, 10),
-      gold: parseInt($("f_gold").value || 0, 10),
-      pending: parseInt($("f_pending").value || 0, 10)
-    };
-    const existing = days.findIndex(d => d.date === date);
-    if (existing >= 0) days[existing] = entry; else days.push(entry);
-    const before = days.slice();
-    const ok = await save();
-    if (ok) {
+    const num = id => { const v = $(id).value; return v === "" ? null : parseInt(v, 10); };
+    const e = { date, regular: num("f_regular") || 0, includesVip: $("f_incl").checked,
+      parquet: num("f_parquet") || 0, diamond: num("f_diamond") || 0, gold: num("f_gold") || 0,
+      daily: num("f_daily"), dailyParquet: num("f_dailyP"), pending: num("f_pending") || 0,
+      notes: $("f_notes").value.split("\n").map(x => x.trim()).filter(Boolean) };
+    if ($("preview").dataset.legacy) e.legacyDaily = true;
+    const before = days.slice(), existing = days.findIndex(d => d.date === date);
+    if (existing >= 0) days[existing] = e; else days.push(e);
+    if (await save()) {
       $("preview").classList.add("hidden"); $("raw").value = "";
-      $("parseHint").innerHTML = '<span class="ok-msg">✓ נשמר במאגר · ' +
-        (existing >= 0 ? "היום עודכן" : "יום חדש נוסף") +
-        ' · העדכון יופיע אצל הצופים תוך כדקה</span>';
+      $("parseHint").innerHTML = '<span class="ok-msg">✓ נשמר במאגר · ' + (existing >= 0 ? "היום עודכן" : "יום חדש נוסף") + " · יופיע אצל הצופים תוך כדקה</span>";
       $("saveHint").textContent = "";
     } else {
-      days = before;
-      $("preview").classList.remove("hidden");
-      $("saveHint").innerHTML = '<span class="err-msg">✕ השמירה נכשלה ולא נשמר דבר: ' +
-        (window.__saveErr || "בדוק טוקן והרשאות") + '</span>';
+      days = before; $("preview").classList.remove("hidden");
+      $("saveHint").innerHTML = '<span class="err-msg">✕ השמירה נכשלה ולא נשמר דבר: ' + (window.__saveErr || "בדוק טוקן והרשאות") + "</span>";
     }
     render();
   };
 
   $("cancelBtn").onclick = () => { $("preview").classList.add("hidden"); $("saveHint").textContent = ""; };
-
-  $("incVip").onchange = async (e) => {
-    vipSeparate = e.target.checked;
-    if (isAdmin) await save();
-    render();
-  };
-
-  $("csvBtn").onclick = () => {
-    const rows = enrich();
-    const csv = ["date,regular,parquet,diamond,gold,vip_day,vip_cum,total,pending"]
-      .concat(rows.map(r => [r.date, r.regular, r.parquet, r.diamond, r.gold, r.vipDay, r.vipCum, r.total, r.pending].join(",")))
-      .join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = "hapoel-subs.csv"; a.click();
-  };
-
-  $("sampleBtn").onclick = () => {
-    $("raw").value = "סיכום יומי 28.8.2026 מכירת מנויים:\nמנויים רגילים: עומדים של 1,367 מנויים.\nמכירות VIP טלפוניות:\nרכשו פרקט: 18\nרכשו יהלום: 4\nרכשו זהב: 4\n11 פרקט נוספים ישלמו ביום א׳";
-  };
-
-  $("cfgSave").onclick = async () => {
-    cfg = {
-      owner: $("c_owner").value.trim(), repo: $("c_repo").value.trim(),
-      branch: $("c_branch").value.trim() || "main", token: $("c_token").value.trim()
-    };
-    saveCfg(); isAdmin = !!cfg.token; applyMode();
+  $("cfgSave").onclick = () => {
+    cfg = { owner: $("c_owner").value.trim(), repo: $("c_repo").value.trim(), branch: $("c_branch").value.trim() || "main", token: $("c_token").value.trim() };
+    localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); isAdmin = !!cfg.token; applyMode();
     $("cfgHint").textContent = "ההגדרות נשמרו. נסה לשמור יום כדי לוודא שהטוקן עובד...";
   };
   $("cfgClear").onclick = () => {
-    localStorage.removeItem(CFG_KEY); cfg.token = ""; isAdmin = location.hash === "#admin";
-    applyMode(); $("cfgHint").textContent = "הטוקן נמחק מהדפדפן הזה...";
+    localStorage.removeItem(CFG_KEY); cfg.token = ""; isAdmin = location.hash === "#admin"; applyMode();
+    $("cfgHint").textContent = "הטוקן נמחק מהדפדפן הזה...";
+  };
+  $("sampleBtn").onclick = () => {
+    $("raw").value = "סיכום יומי 01.09.2026\nמכירת מנויים:\nסה״כ: 1,443\nמכירות VIP טלפוניות\nרכשו פרקט: 35\nרכשו יהלום:10\nרכשו זהב: 6\nרכישה יומית:\nרכשו כולל פרקט: 29 (10 פרקט)\nפירוט נוסף - \n* 8 מנויים חינמים הונפקו באישור\n* 4 מנויי פרקט שולמו ונספרו בדוח אתמול, והונפקו היום\n* 12 מנויים בוטלו ונרכשו מחדש";
+  };
+  $("csvBtn").onclick = () => {
+    const rows = enrich();
+    const csv = ["date,reported,includes_vip,parquet,diamond,gold,vip_cum,vip_new,total,daily_reported,pending"]
+      .concat(rows.map(r => [r.date, r.regular, r.includesVip ? 1 : 0, r.parquet, r.diamond, r.gold, r.vipCum, r.vipDay, r.total, r.daily === null || r.daily === undefined ? "" : r.daily, r.pending || 0].join(","))).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "hapoel-subs.csv"; a.click();
   };
 
   async function refresh(manual) {
     try {
       const r = await fetch(FILE + "?t=" + Date.now(), { cache: "no-store" });
-      if (r.ok) {
-        const parsed = await r.json();
-        days = parsed.days || [];
-        vipSeparate = parsed.vipSeparate !== false;
-        $("incVip").checked = vipSeparate;
-        render();
-      }
+      if (r.ok) { const p = await r.json(); days = p.days || []; INV = p.inventory || INV; render(); }
       if (manual) $("syncHint").textContent = "עודכן ב־" + new Date().toLocaleTimeString("he-IL");
-    } catch (e) {
-      if (manual) $("syncHint").textContent = "לא ניתן לרענן כרגע, נסה שוב...";
-    }
+    } catch (e) { if (manual) $("syncHint").textContent = "לא ניתן לרענן כרגע..."; }
   }
   $("refreshBtn").onclick = () => refresh(true);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(false); });
