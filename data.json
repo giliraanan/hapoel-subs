@@ -40,18 +40,6 @@
       "dailyParquet": 4,
       "pending": 0,
       "notes": []
-    },
-    {
-      "date": "2026-08-30",
-      "regular": 1387,
-      "includesVip": false,
-      "parquet": 27,
-      "diamond": 6,
-      "gold": 4,
-      "daily": null,
-      "dailyParquet": null,
-      "pending": 0,
-      "notes": []
     }
   ],
   "inventory": {
@@ -153,5 +141,5 @@
       }
     ]
   },
-  "updated": "2026-09-01T17:43:30.797Z"
+  "updated": "2026-09-01T17:43:55.898Z"
 }
