@@ -40,9 +40,20 @@
         "4 מנויי פרקט שולמו ונספרו בדוח אתמול, והונפקו היום",
         "12 מנויים בוטלו ונרכשו מחדש"
       ]
+    },
+    {
+      "date": "2026-08-31",
+      "regular": 1406,
+      "includesVip": true,
+      "parquet": 29,
+      "diamond": 6,
+      "gold": 6,
+      "daily": 21,
+      "dailyParquet": 4,
+      "pending": 0,
+      "notes": []
     }
   ],
-  "updated": "2026-09-01T21:00:00.000Z",
   "inventory": {
     "asOf": "2026-08-28",
     "soldAtBaseline": 1393,
@@ -141,5 +152,6 @@
         "left": 0
       }
     ]
-  }
+  },
+  "updated": "2026-09-01T17:41:35.291Z"
 }
