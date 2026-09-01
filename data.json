@@ -15,8 +15,16 @@
       "diamond": 8,
       "gold": 4,
       "pending": 0
+    },
+    {
+      "date": "2026-08-31",
+      "regular": 1365,
+      "parquet": 29,
+      "diamond": 6,
+      "gold": 6,
+      "pending": 0
     }
   ],
   "vipSeparate": true,
-  "updated": "2026-09-01T06:43:27.844Z"
+  "updated": "2026-09-01T06:46:42.590Z"
 }
