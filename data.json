@@ -53,6 +53,21 @@
       "pending": 0,
       "notes": [],
       "legacyDaily": true
+    },
+    {
+      "date": "2026-09-02",
+      "regular": 1465,
+      "includesVip": true,
+      "parquet": 37,
+      "diamond": 10,
+      "gold": 9,
+      "daily": 19,
+      "dailyParquet": 2,
+      "pending": 0,
+      "notes": [
+        "⁠9 מנויים בוטלו ונרכשו מחדש (שינוי מקום)",
+        "3 מנויים - ⁠פער בנתונים מהדוח של אתמול להיום, בבדיקה."
+      ]
     }
   ],
   "inventory": {
@@ -154,5 +169,5 @@
       }
     ]
   },
-  "updated": "2026-09-01T17:46:56.835Z"
+  "updated": "2026-09-02T16:17:09.422Z"
 }
